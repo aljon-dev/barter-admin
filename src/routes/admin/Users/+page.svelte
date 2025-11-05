@@ -2,12 +2,14 @@
 
     import * as Table from "$lib/components/ui/table/index.js";
     import * as Menubar from "$lib/components/ui/menubar/index.js";
+	import DeleteUser from "$lib/AlertDialogs/AdminUserList/DeleteUser.svelte";
 
 
     let {data} = $props();
 
 
 </script>
+
 
 
 <div class='w-full px-6 py-8'>
@@ -66,7 +68,7 @@
    
    </Menubar.Item>
       <Menubar.Separator />
-   <Menubar.Item>Delete</Menubar.Item>
+   <Menubar.Item><DeleteUser/></Menubar.Item>
    <Menubar.Separator />
    <Menubar.Item>Banned</Menubar.Item>
    <Menubar.Separator />
