@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({locals:{supabase}}) => {
         
         
         return{
+            id:subscriber.id,
             firstname:users.firstname,
             lastname:users.lastname,
             profile:users.profile,
@@ -24,7 +25,7 @@ export const load: PageServerLoad = async ({locals:{supabase}}) => {
 
     }) 
 
-    console.log(InfoSubscribers);
+   
 
     
 
