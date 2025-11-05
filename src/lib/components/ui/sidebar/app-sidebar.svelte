@@ -4,6 +4,7 @@
  import InboxIcon from "@lucide/svelte/icons/inbox";
  import FileTextIcon from "@lucide/svelte/icons/file-text";
  import LogOutIcon from "@lucide/svelte/icons/log-out";
+ import PersonIcon from "@lucide/svelte/icons/circle-user"
  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
  import Button from "../button/button.svelte";
  
@@ -28,13 +29,19 @@
   {
    title: "Users",
    url: "/admin/Users",
-   icon: CalendarIcon,
+   icon: PersonIcon,
   },
   {
    title: "Reports",
    url: "/admin/Reports",
    icon: FileTextIcon,
   },
+  {
+    title:"Subscribers",
+    url:"/admin/Subscribers",
+    icon: CalendarIcon
+  }
+
  ];
 </script>
  
