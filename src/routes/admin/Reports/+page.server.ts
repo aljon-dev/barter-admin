@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({locals:{supabase}}) => {
     
     const {data:reports,error:ReportError} = await supabase.from('reports').select('*');
 
-   const reportInfo = reports?.map((report) => {
+  const reportInfo = reports?.map((report) => {
   const complainee = Users?.find((user) => user.userid === report.usercomplaineeid);
   const complainer = Users?.find((user) => user.userid === report.usercomplainantid);
 
@@ -38,6 +38,10 @@ export const load: PageServerLoad = async ({locals:{supabase}}) => {
     createdAt: report.created_at,
   };
 });
+
+    
+
+
 
 
 
