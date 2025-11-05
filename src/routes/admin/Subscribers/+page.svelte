@@ -10,7 +10,7 @@
     <!-- Header -->
     <div class="mb-6">
       <h2 class="text-2xl font-bold tracking-tight">User Overview</h2>
-      <p class="text-muted-foreground mt-1">List of Users</p>
+      <p class="text-muted-foreground mt-1">List of Subscribers</p>
     </div>
 
     <div>
