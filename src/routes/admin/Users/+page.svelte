@@ -9,6 +9,8 @@
   let isOpenDelete = $state(false);
 
   let  isEditing = $state(false);
+
+  let selectedUser = $state({});
    
 </script>
 
@@ -76,11 +78,11 @@
 
               <!-- Ratings -->
               <Table.Cell class="px-4 py-3">
-                {#if user.totalrating && user.totalrating !== 0}
+                {#if user.usertotalrating && user.usertotalrating !== 0}
                   <span
                     class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium"
                   >
-                    ⭐ {(user.rating / user.totalrating).toFixed(1)}
+                    ⭐ {(user.rating / user.usertotalrating).toFixed(1)}
                   </span>
                 {:else}
                   <span
@@ -106,15 +108,13 @@
                     <Menubar.Content align="end" class="w-36">
                       <Menubar.Item
                         class="cursor-pointer hover:bg-blue-50 text-blue-600"
-                        onclick={() => (isEditing = true)}
-                      >
+                        onclick={() => (isEditing = true, selectedUser  = user)}>
                         Edit
                       </Menubar.Item>
                       <Menubar.Separator />
                       <Menubar.Item
                         class="cursor-pointer hover:bg-red-50 text-red-600"
-                        onclick={() => (isOpenDelete = true)}
-                      >
+                        onclick={() => (isOpenDelete = true)} >
                         Delete
                       </Menubar.Item>
                     </Menubar.Content>
@@ -134,6 +134,6 @@
   {/if}
 
   {#if isEditing}
-    <EditingUser bind:isEditing={isEditing} />
+    <EditingUser bind:isEditing={isEditing} bind:userData={selectedUser } />
   {/if}
 </div>
