@@ -2,6 +2,9 @@
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 
   let { isOpen = $bindable() } = $props();
+
+
+  
 </script>
 
 <AlertDialog.Root bind:open={isOpen}>
