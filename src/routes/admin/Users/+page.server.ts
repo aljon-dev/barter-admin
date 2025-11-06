@@ -31,7 +31,7 @@ export const actions: Actions = {
 
     DeleteUser: async ({ request }) => {
     const formData = await request.formData();
-    const userId = formData.get('userId') as string;
+    const userId = formData.get('userid') as string;
 
     if (!userId) {
       return { success: false, message: 'Missing userId' };

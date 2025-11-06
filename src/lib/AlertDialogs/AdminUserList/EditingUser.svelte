@@ -2,13 +2,12 @@
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 	import { Input } from "$lib/components/ui/input";
 	import { Label } from "$lib/components/ui/label";
-      import { Textarea } from "$lib/components/ui/textarea/index.js";
+  import { Textarea } from "$lib/components/ui/textarea/index.js";
     
-
-
   let { isEditing = $bindable(), userData = $bindable({}) } = $props();
-</script>
 
+
+</script>
 
 <AlertDialog.Root bind:open={isEditing}>
   <AlertDialog.Content>
@@ -18,9 +17,7 @@
         <form  class="space-y-4">
           <div class="flex justify-center">
              {#if userData.profile === ''}
-                  <div
-                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary font-semibold rounded-full uppercase"
-                  >
+              <div class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary font-semibold rounded-full uppercase">
                     {userData.firstname[0]}{userData.lastname[0]}
                   </div>
                 {:else}
