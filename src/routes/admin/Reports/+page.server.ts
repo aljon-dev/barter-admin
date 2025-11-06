@@ -1,4 +1,4 @@
-import type { PageServerLoad } from "./$types";
+import type { Actions, PageServerLoad } from "./$types";
 
 
 export const load: PageServerLoad = async ({locals:{supabase}}) => {
@@ -39,21 +39,71 @@ export const load: PageServerLoad = async ({locals:{supabase}}) => {
   };
 });
 
-    
-
-
-
-
+  
 
     return{
-            Users,
-            exchange,
-            reportInfo,
+        Users,
+        exchange,
+        reportInfo,
 
     }
 
 
+};
 
 
+export const actions: Actions = {
+
+
+    resolved: async ({ locals: { supabase }, request }) => {
+
+      const formData = await request.formData();
+      const reportId = formData.get('reportId') as string;
+      
+
+      const {error:updateError} = await supabase.from('reports').update({
+        status:'Resolved'
+      }).eq('id',reportId);
+      
+
+      if(updateError) return {
+        status:500,
+        msg:updateError.message
+      }
+
+      return{
+         status:200,
+         msg:'Successfully Resolved',
+      }
     
+    },
+
+    decline: async ({locals:{supabase},request}) =>{
+
+
+      
+      const formData = await request.formData();
+      const reportId = formData.get('reportId') as string;
+      
+
+      const {error:updateError} = await supabase.from('reports').update({
+        status:'Declined'
+      }).eq('id',reportId);
+      
+
+      if(updateError) return {
+        status:500,
+        msg:updateError.message
+      }
+
+      return{
+         status:200,
+         msg:'Successfully Declined',
+      }
+
+
+
+    } 
+
+  
 };

@@ -1,15 +1,85 @@
 <script lang="ts">
  import * as Table from "$lib/components/ui/table/index.js";
    import * as Menubar from "$lib/components/ui/menubar/index.js";
+   import { Toaster, toast } from 'svelte-sonner'
+
+
+   
+   let {data} = $props();
+
+
+   let  reportsData =  $state(data.reportInfo);
+
+
+   const handleResolved = async (reportId: string) => {
+  const formData = new FormData();
+  formData.append('reportId', reportId);
+
+  try{
+
+    const response = await fetch('/admin/Reports?/resolved', {
+    method: 'POST',
+    body: formData
+  });
+  
+  
+
 
  
+  const result = await response.json().catch(() => null);
 
-   let {data} = $props();
+  if (response.ok && result?.status == 200) {
+    toast.success(result.msg || 'Report marked as resolved ✅');
+    reportsData = data.reportInfo;
+
+    reportsData = reportsData?.map((r)=>
+      r.reportId === reportId ? {...r, status:'Resolved'} : r
+    )
+    
+
+  } else {
+    toast.error(result?.msg || 'Failed to update report ❌');
+    
+  }
+
+  }catch(e){
+    toast.error('Error');
+  }
+  
+};
+
+const handleDeclined = async (reportId: string) => {
+  const formData = new FormData();
+  formData.append('reportId', reportId);
+
+  const response = await fetch('/admin/Reports?/decline', {
+    method: 'POST',
+    body: formData
+  });
+
+ 
+  const result = await response.json().catch(() => null);
+
+  if (response.ok && result?.status == 200) {
+    toast.success(result.msg || 'Report marked as resolved ✅');
+    reportsData = reportsData?.map((r)=>
+      r.reportId === reportId ? {...r, status:'Declined'} : r
+    )
+  } else {
+    toast.error(result?.msg || 'Failed to update report ❌');
+  }
+};
+
+
+
+
+
+   
 
 
 
 </script>
-
+<Toaster/>
 
 <div class="w-full px-6 py-10 bg-background min-h-screen">
   <div class="max-w-7xl mx-auto space-y-8">
@@ -44,7 +114,7 @@
         </Table.Header>
 
         <Table.Body>
-          {#each data.reportInfo ?? [] as reports (reports.reportId)}
+          {#each reportsData ?? [] as reports (reports.reportId)}
             <Table.Row class="hover:bg-muted/10 transition">
               <Table.Cell class="px-4 py-3 font-medium">
                 {reports.reportId}
@@ -76,14 +146,16 @@
                       Update
                     </Menubar.Trigger>
                     <Menubar.Content align="end" class="w-36">
-                      <Menubar.Item
+                      <Menubar.Item 
                         class="cursor-pointer hover:bg-green-50 text-green-600"
+                        onclick={()=> handleResolved(reports.reportId)}
                       >
                         Resolved
                       </Menubar.Item>
                       <Menubar.Separator />
                       <Menubar.Item
                         class="cursor-pointer hover:bg-red-50 text-red-600"
+                        onclick={()=> handleDeclined(reports.reportId)}
                       >
                         Decline
                       </Menubar.Item>
