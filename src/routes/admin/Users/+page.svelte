@@ -106,12 +106,12 @@
                       Action
                     </Menubar.Trigger>
                     <Menubar.Content align="end" class="w-36">
-                      <Menubar.Item
+                     <!-- Menubar.Item
                         class="cursor-pointer hover:bg-blue-50 text-blue-600"
                         onclick={() => (isEditing = true, selectedUser  = user)}>
                         Edit
                       </Menubar.Item>
-                      <Menubar.Separator />
+                      <Menubar.Separator />  --> 
                       <Menubar.Item
                         class="cursor-pointer hover:bg-red-50 text-red-600"
                         onclick={() => (isOpenDelete = true)} >
