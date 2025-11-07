@@ -1,15 +1,19 @@
 <script lang="ts">
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 	import { toast } from "svelte-sonner";
-
-  let { isOpen = $bindable(), userData = $bindable({}) } = $props();
+    import { invalidate } from '$app/navigation';
+  let { isOpen = $bindable(), userid = $bindable() } = $props();
 
 
   const confirmDeleteUser = async  () =>{
 
+    console.log( userid )
+
+   
+
     const formData = new FormData();
 
-    const userId = formData.append('userid',userData.userId)
+    formData.append('userid', userid )
 
     const response = await fetch('/admin/Users?/DeleteUser',{
       method:'POST',
@@ -18,6 +22,8 @@
 
     if(response.status === 200){
        toast.success('Successfully Deleted')
+     
+       isOpen = false;
     }else{
       toast.error('Faile to delete');
     }

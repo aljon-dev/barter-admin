@@ -2,16 +2,93 @@
   import * as Table from "$lib/components/ui/table/index.js";
   import * as Menubar from "$lib/components/ui/menubar/index.js";
   import DeleteUser from "$lib/AlertDialogs/AdminUserList/DeleteUser.svelte";
-	import EditingUser from "$lib/AlertDialogs/AdminUserList/EditingUser.svelte";
+  import { invalidate } from "$app/navigation";
+  import { createClient } from "@supabase/supabase-js";
+
+  const PUBLIC_SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON;
+
+  // Create Supabase client from public environment variables
+  const supabase = createClient(PUBLIC_SUPABASE_URL, SUPABASE_ANON);
 
   let { data } = $props();
-  
+
   let isOpenDelete = $state(false);
+  let selectedUserId = $state<string>();
+  let users = $state(data.Users ?? []);
+  let subscription = $state<any>(null);
 
-  let  isEditing = $state(false);
+  // Set up Supabase realtime subscription using $effect
+  $effect(() => {
+    // Subscribe to changes in the users table
+    subscription = supabase
+      .channel('users-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events: INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'users' // Replace with your actual table name
+        },
+        (payload) => {
+          handleRealtimePayload(payload);
+        }
+      )
+      .subscribe();
 
-  let selectedUser = $state({});
-   
+    console.log('Subscribed to users realtime changes');
+
+    // Cleanup function - runs when component unmounts or when dependencies change
+    return () => {
+      if (subscription) {
+        supabase.removeChannel(subscription);
+        console.log('Unsubscribed from users realtime changes');
+      }
+    };
+  });
+
+  // Handle realtime payload from Supabase
+  const handleRealtimePayload = (payload: any) => {
+    const { eventType, new: newRecord, old: oldRecord } = payload;
+
+    switch (eventType) {
+      case 'INSERT':
+        // Add new user to the beginning of the list
+        users = [newRecord, ...users];
+        break;
+
+      case 'UPDATE':
+        // Update existing user
+        users = users.map(user => 
+          user.id === newRecord.id ? { ...user, ...newRecord } : user
+        );
+        break;
+
+      case 'DELETE':
+        // Remove deleted user
+        users = users.filter(user => user.id !== oldRecord.id);
+        
+        // Close delete modal if the deleted user was selected
+        if (selectedUserId === oldRecord.id) {
+          isOpenDelete = false;
+          selectedUserId = undefined;
+        }
+        break;
+
+      default:
+        console.warn('Unknown event type:', eventType);
+    }
+
+    // Invalidate to refresh any derived data
+    invalidate('app:users');
+  };
+
+  // Handle user deletion from modal
+  const handleUserDeleted = (deletedUserId: string) => {
+    users = users.filter(user => user.id !== deletedUserId);
+    isOpenDelete = false;
+    selectedUserId = undefined;
+  };
 </script>
 
 <div class="w-full px-6 py-10 bg-background min-h-screen">
@@ -24,9 +101,11 @@
         </h2>
         <p class="text-muted-foreground mt-1">
           List of all registered users and their details.
+          <span class="inline-flex items-center gap-1 ml-2 px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+            ● Live
+          </span>
         </p>
       </div>
-  
     </div>
 
     <!-- User Table -->
@@ -48,7 +127,7 @@
         </Table.Header>
 
         <Table.Body>
-          {#each data.Users ?? [] as user (user.id)}
+          {#each users as user (user.id)}
             <Table.Row class="hover:bg-muted/10 transition">
               <Table.Cell class="px-4 py-3 font-medium">
                 {user.id}
@@ -56,11 +135,11 @@
 
               <!-- Profile -->
               <Table.Cell class="px-4 py-3">
-                {#if user.profile === ''}
+                {#if !user.profile || user.profile === ''}
                   <div
                     class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary font-semibold rounded-full uppercase"
                   >
-                    {user.firstname[0]}{user.lastname[0]}
+                    {user.firstname?.[0]}{user.lastname?.[0]}
                   </div>
                 {:else}
                   <img
@@ -106,15 +185,13 @@
                       Action
                     </Menubar.Trigger>
                     <Menubar.Content align="end" class="w-36">
-                     <!-- Menubar.Item
-                        class="cursor-pointer hover:bg-blue-50 text-blue-600"
-                        onclick={() => (isEditing = true, selectedUser  = user)}>
-                        Edit
-                      </Menubar.Item>
-                      <Menubar.Separator />  --> 
                       <Menubar.Item
                         class="cursor-pointer hover:bg-red-50 text-red-600"
-                        onclick={() => (isOpenDelete = true)} >
+                        onclick={() => {
+                          isOpenDelete = true;
+                          selectedUserId = user.userid || user.id; // Use appropriate ID field
+                        }}
+                      >
                         Delete
                       </Menubar.Item>
                     </Menubar.Content>
@@ -128,12 +205,12 @@
     </div>
   </div>
 
-  <!-- Modals -->
+  <!-- Delete Modal -->
   {#if isOpenDelete}
-    <DeleteUser bind:isOpen={isOpenDelete} />
-  {/if}
-
-  {#if isEditing}
-    <EditingUser bind:isEditing={isEditing} bind:userData={selectedUser } />
+    <DeleteUser
+      bind:isOpen={isOpenDelete}
+      bind:userid={selectedUserId}
+      
+    />
   {/if}
 </div>

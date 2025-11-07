@@ -33,6 +33,8 @@ export const actions: Actions = {
     const formData = await request.formData();
     const userId = formData.get('userid') as string;
 
+    console.log(userId)
+
     if (!userId) {
       return { success: false, message: 'Missing userId' };
     }
@@ -51,7 +53,7 @@ export const actions: Actions = {
       .eq('userid', userId);
 
     if (deleteDbError) {
-      console.error(deleteDbError.message);
+      console.error('error'+deleteDbError.message);
       return { success: false, message: 'Failed to delete from users table' };
     }
 
