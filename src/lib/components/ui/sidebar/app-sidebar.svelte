@@ -7,6 +7,9 @@
  import PersonIcon from "@lucide/svelte/icons/circle-user"
  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
  import Button from "../button/button.svelte";
+	import { toast } from "svelte-sonner";
+	import { goto } from "$app/navigation";
+	import { enhance } from "$app/forms";
  
  let activeUrl = $state('admin');
 
@@ -23,7 +26,7 @@
   },
   {
    title: "Transactions",
-   url: "transactions",
+   url: "/admin/Transactions",
    icon: InboxIcon,
   },
   {
@@ -43,6 +46,16 @@
   }
 
  ];
+
+
+ const handleLogout = () => {
+    return async ({ result }: { result: { type: string } }) => {
+      if (result.type === 'success') {
+        toast.success('Logged out successfully');
+        goto('/'); // redirect to login page
+      }
+    };
+  };
 </script>
  
 <Sidebar.Root>
@@ -78,10 +91,12 @@
 
   <!-- Footer section for logout -->
   <div class="p-4 border-t mt-auto">
-   <Button variant="outline" class="w-full justify-start gap-2">
-    <LogOutIcon class="h-4 w-4" />
-    Log Out
-   </Button>
+   <form method="POST" action="?/logout" use:enhance={handleLogout}>
+	<Button type="submit" variant="outline" class="w-full justify-start gap-2">
+		<LogOutIcon class="h-4 w-4" />
+		Log Out
+	</Button>
+</form>
   </div>
  </Sidebar.Content>
 </Sidebar.Root>

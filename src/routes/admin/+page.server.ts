@@ -1,4 +1,4 @@
-import type { PageServerLoad } from "./$types";
+import type { Actions, PageServerLoad } from "./$types";
 
 
 export const load: PageServerLoad = async ({locals:{supabase}}) => {
@@ -52,4 +52,20 @@ export const load: PageServerLoad = async ({locals:{supabase}}) => {
 
 
     
+};
+
+
+export const actions: Actions = {
+	logout: async ({ locals: { supabase }, cookies }) => {
+		await supabase.auth.signOut();
+
+		// Optionally clear any custom session cookies
+		cookies.delete('sb-access-token', { path: '/' });
+		cookies.delete('sb-refresh-token', { path: '/' });
+
+		return {
+			status: 200,
+			success: true
+		};
+	}
 };
